@@ -105,7 +105,7 @@ function onBooleanMessage( name, value ){
 		      String("sending config").cyan
 		    ].join(" "));
 
-			sb.send("config", "string", JSON.stringify( config ) );
+			sb.send("config", "string", JSON.stringify( config ) );//or toString()?
 			break;
 		case "capture button":
 			if(value == true){
@@ -118,7 +118,7 @@ function onBooleanMessage( name, value ){
 
 				//change output filename to current timestamp
 				var timestamp_filename = new Date().getTime() + ".png";
-				camera.set("output", timestamp_filename);
+				camera.set("output", image_path + timestamp_filename);
 
 				// start timelapse
 				camera.start();
