@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 	<head>
-    <title>Shutter Example</title>
+    <title>Capture Example</title>
 
     <meta charset="utf-8">
     <link rel="stylesheet" href="css/reset.css" type="text/css" media="screen" charset="utf-8" />
@@ -15,17 +15,13 @@
 	      
 		// Spacebrew Object
 		var sb
-			, app_name = "timelapse controls"
+			, app_name = "snapshot controls"
 			;
 
 		/**
 	     * setup Configure spacebrew connection and adds the mousedown listener.
 	     */
 		function setup (){
-			var random_id = "0000" + Math.floor(Math.random() * 10000)
-				;
-
-			app_name = app_name + ' ' + random_id.substring(random_id.length-4);
 
 			// create spacebrew client object
 			sb = new Spacebrew.Client("server.sitetosite.co", {reconnect:true});
