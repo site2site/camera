@@ -23,7 +23,7 @@ sb.addSubscribe("capture button", "boolean");	// subscription for taking snapsho
 sb.addSubscribe("test button", "boolean");		// subscription for sending test snapshot
 
 
-sb.addPublish("image", "binary.png");		// publish the serialized binary image data
+sb.addPublish("image", "binary");		// publish the serialized binary image data
 
 
 sb.onBooleanMessage = onBooleanMessage;	
@@ -65,7 +65,12 @@ function onOpen() {
 			var base64data = data.toString('base64');
 			console.log('sending base 64 with length' + base64data.length);
 
-			sb.send("image", "binary.png", base64data);
+			var message = {
+				filename: filename,
+				binary: base64data
+			};
+
+			sb.send("image", "binary", message.toString('base64'));
 		});
 	});
 
@@ -126,7 +131,12 @@ function onBooleanMessage( name, value ){
 					var base64data = data.toString('base64');
 					console.log('sending base 64 with length' + base64data.length);
 
-					sb.send("image", "binary.png", base64data);
+					var message = {
+						filename: "image_000007.png",
+						binary: base64data
+					};
+
+					sb.send("image", "binary", message.toString('base64'));
 				});
 			}
 	}
