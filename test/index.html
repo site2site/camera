@@ -33,7 +33,7 @@
 			// configure the publication and subscription feeds
 			sb.addPublish( "capture button", "boolean", "false" );
 			sb.addPublish( "test button", "boolean", "false" );
-			sb.addSubscribe( "image src", "string" );
+			sb.addSubscribe( "image url", "string" );
 
 			// override Spacebrew events - this is how you catch events coming from Spacebrew
 			sb.onStringMessage = onStringMessage;
@@ -108,7 +108,7 @@
 			console.log("[onStringMessage] string message received ", value);
 			
 			switch(name){
-				case "image src":
+				case "image url":
 					$("#source").attr("src", value);
 					console.log('received source with src: '+ value);
 					break;
