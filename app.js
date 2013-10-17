@@ -136,7 +136,10 @@ function onBooleanMessage( name, value ){
 						binary: base64data
 					};
 
-					sb.send("image", "binary", message.toString('base64'));
+					console.log('stringified:');
+					console.log(JSON.stringify( message ));
+
+					sb.send("image", "binary", JSON.stringify( message ).toString('base64'));
 				});
 			}
 	}
