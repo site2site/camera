@@ -31,9 +31,9 @@
 			sb.description("Start and stop controls for the Raspicam timelapse");
 
 			// configure the publication and subscription feeds
-			sb.addPublish( "capture", "boolean", "false" );
-			sb.addPublish( "test", "boolean", "false" );
-			sb.addSubscribe( "src", "string" );
+			sb.addPublish( "capture button", "boolean", "false" );
+			sb.addPublish( "test button", "boolean", "false" );
+			sb.addSubscribe( "image src", "string" );
 
 			// override Spacebrew events - this is how you catch events coming from Spacebrew
 			sb.onStringMessage = onStringMessage;
@@ -67,7 +67,7 @@
 	     */
 		function capturePress (evt){
 		      	console.log("[onButtonPress] capture button has been pressed"); 
-	        sb.send("capture", "boolean", "true");
+	        sb.send("capture button", "boolean", "true");
 		}
 
 		/**
@@ -76,7 +76,7 @@
 	     */
 		function captureRelease (evt){
 	      	console.log("[onButtonRelease] capture button has been released"); 
-	        sb.send("capture", "boolean", "false");
+	        sb.send("capture button", "boolean", "false");
 		}
 
 
@@ -86,7 +86,7 @@
 	     */
 		function testPress (evt){
 		      	console.log("[onButtonPress] stop button has been pressed"); 
-	        sb.send("test", "boolean", "true");
+	        sb.send("test button", "boolean", "true");
 		}
 
 		/**
@@ -95,7 +95,7 @@
 	     */
 		function testRelease (evt){
 	      	console.log("[onButtonRelease] stop button has been released"); 
-	        sb.send("test", "boolean", "false");
+	        sb.send("test button", "boolean", "false");
 		}
 
 		/**
@@ -108,7 +108,7 @@
 			console.log("[onStringMessage] string message received ", value);
 			
 			switch(name){
-				case "src":
+				case "image src":
 					$("#source").attr("src", value);
 					console.log('received source with src: '+ value);
 					break;

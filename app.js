@@ -19,8 +19,8 @@ sb = new Spacebrew.Client( config.server, config.name, config.description );  //
 //sb.addSubscribe("config", "boolean");	// subscription for config handshake
 
 
-sb.addSubscribe("capture", "boolean");	// subscription for taking snapshot
-sb.addSubscribe("test", "boolean");		// subscription for sending test snapshot
+sb.addSubscribe("capture button", "boolean");	// subscription for taking snapshot
+sb.addSubscribe("test button", "boolean");		// subscription for sending test snapshot
 
 
 sb.addPublish("image", "binary.png");		// publish the serialized binary image data
@@ -102,7 +102,7 @@ function onBooleanMessage( name, value ){
 
 			sb.send("config", "string", JSON.stringify( config ) );
 			break;
-		case "capture":
+		case "capture button":
 			if(value == true){
 				console.log([
 			      // Timestamp
@@ -119,7 +119,7 @@ function onBooleanMessage( name, value ){
 				camera.start();
 			}	
 			break;
-		case "test":
+		case "test button":
 			if(value == true){
 				console.log("calling test");
 				fs.readFile(image_path + "image_000007.png", function(err, data) {
