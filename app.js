@@ -58,6 +58,10 @@ function onOpen() {
 
 		setTimeout(function(){
 			fs.readFile(image_path + filename, function(err, data) {
+				if(err){
+					console.log('Error attempting to read captured file with msg: '+ err);
+					return false;
+				}
 				var base64data = data.toString('base64');
 				console.log('sending base 64 with length' + base64data.length);
 
