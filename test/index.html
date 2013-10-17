@@ -1,0 +1,142 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+    <title>Shutter Example</title>
+
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="css/reset.css" type="text/css" media="screen" charset="utf-8" />
+    <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+
+    <script type="text/javascript" src="js/jq.js"></script>
+	<script type="text/javascript" src="js/sb-1.3.0.js"></script>
+    <script type="text/javascript">
+
+		$(window).on("load", setup);
+	      
+		// Spacebrew Object
+		var sb
+			, app_name = "timelapse controls"
+			;
+
+		/**
+	     * setup Configure spacebrew connection and adds the mousedown listener.
+	     */
+		function setup (){
+			var random_id = "0000" + Math.floor(Math.random() * 10000)
+				;
+
+			app_name = app_name + ' ' + random_id.substring(random_id.length-4);
+
+			// create spacebrew client object
+			sb = new Spacebrew.Client("server.sitetosite.co", {reconnect:true});
+
+			// set the base description
+			sb.name(app_name);
+			sb.description("Start and stop controls for the Raspicam timelapse");
+
+			// configure the publication and subscription feeds
+			sb.addPublish( "capture", "boolean", "false" );
+			sb.addPublish( "test", "boolean", "false" );
+			sb.addSubscribe( "src", "string" );
+			sb.addSubscribe( "out", "string" );
+
+			// override Spacebrew events - this is how you catch events coming from Spacebrew
+			sb.onStringMessage = onStringMessage;
+			sb.onOpen = onOpen;
+
+			// connect to spacbrew
+			sb.connect();
+
+			// listen to the mouse 
+			$("#capture").on("mousedown", capturePress);
+			$("#capture").on("mouseup", captureRelease);
+
+			$("#test").on("mousedown", testPress);
+			$("#test").on("mouseup", testRelease);
+		}	
+
+		/**
+		 * Function that is called when Spacebrew connection is established
+		 */
+		function onOpen() {
+			var message = "Connected as <strong>" + sb.name() + "</strong>. ";
+			if (sb.name() === app_name) {
+				message += "<br>You can customize this app's name in the query string by adding <strong>name=your_app_name</strong>."
+			}
+			$("#name").html( message );
+		}
+
+		/**
+	     * Function that is called whenever the button is pressed.  
+	     * @param  {Event object} evt Holds information about the button press event
+	     */
+		function capturePress (evt){
+		      	console.log("[onButtonPress] capture button has been pressed"); 
+	        sb.send("capture", "boolean", "true");
+		}
+
+		/**
+	     * Function that is called whenever the button is released.  
+	     * @param  {Event object} evt Holds information about the button press event
+	     */
+		function captureRelease (evt){
+	      	console.log("[onButtonRelease] capture button has been released"); 
+	        sb.send("capture", "boolean", "false");
+		}
+
+
+		/**
+	     * Function that is called whenever the button is pressed.  
+	     * @param  {Event object} evt Holds information about the button press event
+	     */
+		function testPress (evt){
+		      	console.log("[onButtonPress] stop button has been pressed"); 
+	        sb.send("test", "boolean", "true");
+		}
+
+		/**
+	     * Function that is called whenever the button is released.  
+	     * @param  {Event object} evt Holds information about the button press event
+	     */
+		function testRelease (evt){
+	      	console.log("[onButtonRelease] stop button has been released"); 
+	        sb.send("test", "boolean", "false");
+		}
+
+		/**
+		 * onStringMessage Function that is called whenever new spacebrew string messages are received.
+		 *          It accepts two parameters:
+		 * @param  {String} name    Holds name of the subscription feed channel
+		 * @param  {String} value  Holds value received from the subscription feed
+		 */
+		function onStringMessage( name, value ){
+			console.log("[onStringMessage] string message received ", value);
+			
+			switch(name){
+				case "src":
+					$("#source").attr("src", value);
+					console.log('received source with src: '+ value);
+					break;
+			}
+		}
+
+	</script>
+	</head>
+
+	<body>
+		<div>
+			<h1>Use the buttons below to control the timelapse module</h1>
+			<h3 id="numclicks"></h3>
+			<a class="button" id="capture">Capture Snapshot</a>
+			<a class="button" id="test">Test Binary Transfer</a>
+
+
+			</br></br>
+			<div id="name">Trying to connect</div>
+		</div>
+		<div>
+			<img id="source" src="">
+		</div>
+	</body>
+
+</html>

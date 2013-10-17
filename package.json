@@ -1,0 +1,17 @@
+{
+    "name": "camera",
+    "description": "Raspberry Pi camera for taking snapshots",
+    "version": "0.0.1",
+    "author": {
+        "name": "Troy Conrad Therrien <troyth@gmail.com>",
+        "email": "troyth@gmail.com"
+    },
+    "dependencies": {
+        "ws": "*",
+        "colors": "*",
+        "raspicam": "*"
+    },
+    "engines": {
+        "node": ">=0.10.0"
+    }
+}
