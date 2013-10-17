@@ -56,8 +56,19 @@ function onOpen() {
 	camera.on("read", function( err, timestamp, filename ){
 		console.log("snapshot taken with filename: " + filename);
 
-		//send the url to the image to be used as a src in client apps
-		//sb.send("src", "string", image_path + filename);
+		setTimeout(function(){
+			fs.readFile(image_path + filename, function(err, data) {
+				var base64data = data.toString('base64');
+				console.log('sending base 64 with length' + base64data.length);
+
+				var message = {
+					filename: filename,
+					binary: base64data
+				};
+
+				sb.send("image", "binary", message.toString('base64'));
+			});
+		}, 2000);
 	});
 
 	camera.on("data", function( err, timestamp, filename ){
