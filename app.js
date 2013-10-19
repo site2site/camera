@@ -53,6 +53,8 @@ function onOpen() {
 		//console.log("snapshot taken at " + timestamp);
 	});
 
+
+	/*
 	camera.on("read", function( err, timestamp, filename ){
 		console.log("snapshot taken with filename: " + filename);
 
@@ -74,19 +76,37 @@ function onOpen() {
 			});
 		}, 2000);
 	});
+	*/
 
-	camera.on("data", function( err, timestamp, filename ){
-		fs.readFile(image_path + filename, function(err, data) {
-			var base64data = data.toString('base64');
-			console.log('sending base 64 with length' + base64data.length);
 
-			var message = {
-				filename: filename,
-				binary: base64data
-			};
+	camera.on("read", function( err, timestamp, filename ){
+		if(err){
+			console.log('Error camera read emitted with message : '+ err);
+			return false;
+		}
+		console.log("snapshot taken with filename: " + filename);
+		if(filename.charAt(filename.length-1) != "~"){
 
-			sb.send("image", "binary", message.toString('base64'));
-		});
+			setTimeout(function(){
+				fs.readFile(image_path + filename, function(err, data) {
+					if(err){
+						console.log('Error attempting to read captured file with msg: '+ err);
+						return false;
+					}
+					var base64data = data.toString('base64');
+					console.log('sending base 64 with length' + base64data.length);
+
+					var message = {
+						filename: filename,
+						binary: base64data,
+						encoding: "png"
+					};
+
+					sb.send("image", "binary", message.toString('base64'));
+				});
+			}, 2000);
+		}
+			
 	});
 
 	camera.on("exit", function( timestamp ){
