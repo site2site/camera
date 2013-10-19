@@ -94,7 +94,6 @@ function onOpen() {
 						return false;
 					}
 					var base64data = data.toString('base64');
-					console.log('sending base 64 with length' + base64data.length);
 
 					var message = {
 						filename: filename,
@@ -102,7 +101,9 @@ function onOpen() {
 						encoding: "png"
 					};
 
-					sb.send("image", "binary", message.toString('base64'));
+					console.log('sending image with filename: ' + message.filename );
+
+					sb.send("image", "binary", message);
 				});
 			}, 2000);
 		}
