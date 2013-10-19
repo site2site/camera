@@ -103,7 +103,7 @@ function onOpen() {
 
 					console.log('sending image with filename: ' + message.filename );
 
-					sb.send("image", "binary", message);
+					sb.send("image", "binary", JSON.stringify( message ) );
 				});
 			}, 2000);
 		}
