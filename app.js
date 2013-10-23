@@ -3,11 +3,14 @@ var RaspiCam = require("raspicam"),
 	Spacebrew = require('./sb-1.3.0').Spacebrew,
 	sb,
 	camera,
+	image_timestamp,
 	config = require("./machine"),
 	fs = require("fs");
 
 
 var image_path = __dirname + "/files/";
+
+var IMAGE_TTL = 40000;//time after which to delete image
 
 
 // setup spacebrew
@@ -19,8 +22,8 @@ sb = new Spacebrew.Client( config.server, config.name, config.description );  //
 //sb.addSubscribe("config", "boolean");	// subscription for config handshake
 
 
-sb.addSubscribe("capture button", "boolean");	// subscription for taking snapshot
-sb.addSubscribe("test button", "boolean");		// subscription for sending test snapshot
+sb.addSubscribe("capture", "boolean");	// subscription for taking snapshot
+sb.addSubscribe("stop", "boolean");	// subscription for stopping snapshopt
 
 
 sb.addPublish("image", "binary");		// publish the serialized binary image data
@@ -39,6 +42,9 @@ sb.connect();
 function onOpen() {
 	console.log( "Connected through Spacebrew as: " + sb.name() + "." );
 
+	image_timestamp = new Date().getTime();//temporary timestamp
+	console.log("connected at: " + image_timestamp);
+
 	// initialize RaspiCam timelapse
 	camera = new RaspiCam({
 		mode: "photo",
@@ -50,65 +56,53 @@ function onOpen() {
 	});
 
 	camera.on("start", function( err, timestamp ){
-		//console.log("snapshot taken at " + timestamp);
+		console.log("snapshot start at " + timestamp);
 	});
 
-
-	/*
 	camera.on("read", function( err, timestamp, filename ){
-		console.log("snapshot taken with filename: " + filename);
+		console.log("snapshot captured with filename: " + filename);
 
-		setTimeout(function(){
-			fs.readFile(image_path + filename, function(err, data) {
-				if(err){
-					console.log('Error attempting to read captured file with msg: '+ err);
-					return false;
-				}
-				var base64data = data.toString('base64');
-				console.log('sending base 64 with length' + base64data.length);
-
-				var message = {
-					filename: filename,
-					binary: base64data
-				};
-
-				sb.send("image", "binary", message.toString('base64'));
-			});
-		}, 2000);
-	});
-	*/
-
-
-	camera.on("read", function( err, timestamp, filename ){
-		if(err){
-			console.log('Error camera read emitted with message : '+ err);
-			return false;
-		}
-		console.log("snapshot taken with filename: " + filename);
+		//don't trigger on provisional file with trailing ~
 		if(filename.charAt(filename.length-1) != "~"){
 
 			setTimeout(function(){
-				fs.readFile(image_path + filename, function(err, data) {
-					if(err){
-						console.log('Error attempting to read captured file with msg: '+ err);
-						return false;
-					}
-					var base64data = data.toString('base64');
+				console.log("calling readfile with: " + image_path + filename);
 
-					var message = {
+				fs.readFile(image_path + filename, function(err, data) {
+					var base64data = data.toString('base64');
+					console.log('sending base 64 with length' + base64data.length);
+
+					var message = { 
 						filename: filename,
+						image_timestamp: image_timestamp,
 						binary: base64data,
 						encoding: "png"
 					};
 
 					console.log('sending image with filename: ' + message.filename );
-
 					sb.send("image", "binary", JSON.stringify( message ) );
+
+					if(IMAGE_TTL > 0){
+						//delete file after 40s
+						setTimeout(function(){
+							fs.unlink(image_path + filename, function (err) {
+								if (err){
+									console.log("Error attempting to delete: " + image_path + filename );
+									return false;
+								}
+								console.log("Deleted: " + image_path + filename );
+
+							});
+						}, IMAGE_TTL);
+					}
+					
 				});
 			}, 2000);
 		}
+		
 			
 	});
+
 
 	camera.on("exit", function( timestamp ){
 		console.log("snapshot child process has exited");
@@ -133,17 +127,7 @@ function onBooleanMessage( name, value ){
 	console.log("[onBooleanMessage] value: " + value + " name: " + name);
 
 	switch(name){
-		case "config":
-			console.log([
-		      // Timestamp
-		      String(+new Date()).grey,
-		      // Message
-		      String("sending config").cyan
-		    ].join(" "));
-
-			sb.send("config", "string", JSON.stringify( config ) );//or toString()?
-			break;
-		case "capture button":
+		case "capture":
 			if(value == true){
 				console.log([
 			      // Timestamp
@@ -152,31 +136,31 @@ function onBooleanMessage( name, value ){
 			      String("starting camera").magenta
 			    ].join(" "));
 
-				//change output filename to current timestamp
-				var timestamp_filename = new Date().getTime() + ".png";
-				camera.set("output", image_path + timestamp_filename);
+				image_timestamp = new Date().getTime();
 
-				// start timelapse
+		    	var image_name = image_timestamp + camera.get("encoding");
+
+		    	console.log("setting output: " + image_path + image_name);
+		    	camera.set("output", image_path + image_name);
+
+		    	console.log("output set as: " + camera.get("output"));
+		    	console.log("taking snapshot....");
+		    	// take snapshot
 				camera.start();
+			    	
 			}	
-			break;
-		case "test button":
+		case "stop":
 			if(value == true){
-				console.log("calling test");
-				fs.readFile(image_path + "test/test.png", function(err, data) {
-					var base64data = data.toString('base64');
-					console.log('sending base 64 with length' + base64data.length);
+				console.log([
+			      // Timestamp
+			      String(+new Date()).grey,
+			      // Message
+			      String("stopping camera").magenta
+			    ].join(" "));
 
-					var message = {
-						filename: "test.png",
-						binary: base64data
-					};
-
-					console.log('stringified:');
-					console.log(JSON.stringify( message ));
-
-					sb.send("image", "binary", JSON.stringify( message ).toString('base64'));
-				});
+				// stop timelapse
+				camera.stop();
 			}
+			break;
 	}
 }
