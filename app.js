@@ -50,8 +50,8 @@ function onOpen() {
 		mode: "photo",
 		output: image_path + "image.png", // will change this before taking a picture
 		encoding: "png",
-		width: 640,
-		height: 480,
+		width: 1800,
+		height: 1200,
 		timeout: 0 // take snapshot immediately with 0 delay
 	});
 
@@ -153,6 +153,7 @@ function onBooleanMessage( name, value ){
 			}	
 		case "stop":
 			if(value == true){
+				/*
 				console.log([
 			      // Timestamp
 			      String(+new Date()).grey,
@@ -161,7 +162,8 @@ function onBooleanMessage( name, value ){
 			    ].join(" "));
 
 				// stop timelapse
-				//camera.stop();
+				camera.stop();
+				*/
 			}
 			break;
 	}
