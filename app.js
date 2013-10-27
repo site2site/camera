@@ -138,7 +138,7 @@ function onBooleanMessage( name, value ){
 
 				image_timestamp = new Date().getTime();
 
-		    	var image_name = image_timestamp + camera.get("encoding");
+		    	var image_name = image_timestamp + "." + camera.get("encoding");
 
 		    	console.log("setting output: " + image_path + image_name);
 		    	camera.set("output", image_path + image_name);
