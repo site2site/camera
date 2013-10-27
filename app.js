@@ -50,8 +50,8 @@ function onOpen() {
 		mode: "photo",
 		output: image_path + "image.png", // will change this before taking a picture
 		encoding: "png",
-		width: 1800,
-		height: 1200,
+		width: 2592,
+		height: 1944,
 		timeout: 0 // take snapshot immediately with 0 delay
 	});
 
