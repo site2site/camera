@@ -129,14 +129,16 @@ function onBooleanMessage( name, value ){
 	switch(name){
 		case "capture":
 			if(value == true){
+				image_timestamp = new Date().getTime();
+
 				console.log([
 			      // Timestamp
 			      String(+new Date()).grey,
 			      // Message
-			      String("starting camera").magenta
+			      String("starting camera").magenta,
+			      String("with timestamp: ").grey,
+			      image_timestamp.cyan
 			    ].join(" "));
-
-				image_timestamp = new Date().getTime();
 
 		    	var image_name = image_timestamp + "." + camera.get("encoding");
 
