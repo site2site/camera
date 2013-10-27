@@ -43,24 +43,38 @@ function onOpen() {
 	console.log( "Connected through Spacebrew as: " + sb.name() + "." );
 
 	image_timestamp = new Date().getTime();//temporary timestamp
-	console.log("connected at: " + image_timestamp);
+	console.log("connected at: " + image_timestamp + "\n");
 
 	// initialize RaspiCam timelapse
 	camera = new RaspiCam({
 		mode: "photo",
 		output: image_path + "image.png", // will change this before taking a picture
 		encoding: "png",
-		width: 1800,
-		height: 1200,
+		width: 640,
+		height: 480,
+		//colfx: "128:128", //greyscale
 		timeout: 0 // take snapshot immediately with 0 delay
 	});
 
 	camera.on("start", function( err, timestamp ){
-		console.log("snapshot start at " + timestamp);
+		console.log([
+			// Timestamp
+			String(+new Date()).grey,
+			// Message
+			String("CAMERA emitted START at ").green,
+			timestamp.grey
+		].join(" "));
 	});
 
 	camera.on("read", function( err, timestamp, filename ){
-		console.log("snapshot captured with filename: " + filename);
+		console.log([
+			// Timestamp
+			String(+new Date()).grey,
+			// Message
+			String("CAMERA emitted READ with ").green,
+			filename,
+			timestamp.grey
+		].join(" "));
 
 		//don't trigger on provisional file with trailing ~
 		if(filename.charAt(filename.length-1) != "~"){
@@ -105,11 +119,23 @@ function onOpen() {
 
 
 	camera.on("exit", function( timestamp ){
-		console.log("snapshot child process has exited");
+		console.log([
+			// Timestamp
+			String(+new Date()).grey,
+			// Message
+			String("CAMERA EXITED at ").green,
+			timestamp.grey
+		].join(" "));
 	});
 
 	camera.on("stop", function( err, timestamp ){
-		console.log("snapshot child process has been stopped at " + timestamp);
+		console.log([
+			// Timestamp
+			String(+new Date()).grey,
+			// Message
+			String("CAMERA emitted STOP at ").green,
+			timestamp.grey
+		].join(" "));
 	});
 
 }
@@ -123,37 +149,36 @@ function onOpen() {
  * @param  {String} value 	Holds value received from the subscription feed
  */
 function onBooleanMessage( name, value ){
-
-	console.log("[onBooleanMessage] value: " + value + " name: " + name);
+	console.log([
+		// Timestamp
+		String(+new Date()).grey,
+		// Message
+		String("+++++++ RECEIVED from controller:").cyan,
+		name.grey,
+		value
+	].join(" "));
 
 	switch(name){
 		case "capture":
 			if(value == true){
 				image_timestamp = new Date().getTime();
 
-				console.log([
+		    	var image_name = image_timestamp + "." + camera.get("encoding");
+
+		    	console.log([
 			      // Timestamp
 			      String(+new Date()).grey,
 			      // Message
-			      String("starting camera").magenta,
-			      String("with timestamp: ").grey,
-			      image_timestamp.cyan
+			      String("starting camera with filename:").blue,
+			      camera.get("output")
 			    ].join(" "));
 
-		    	var image_name = image_timestamp + "." + camera.get("encoding");
-
-		    	console.log("setting output: " + image_path + image_name);
-		    	camera.set("output", image_path + image_name);
-
-		    	console.log("output set as: " + camera.get("output"));
-		    	console.log("taking snapshot....");
 		    	// take snapshot
 				camera.start();
 			    	
 			}	
 		case "stop":
 			if(value == true){
-				/*
 				console.log([
 			      // Timestamp
 			      String(+new Date()).grey,
@@ -163,7 +188,6 @@ function onBooleanMessage( name, value ){
 
 				// stop timelapse
 				camera.stop();
-				*/
 			}
 			break;
 	}
