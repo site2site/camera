@@ -23,8 +23,6 @@ sb = new Spacebrew.Client( config.server, config.name, config.description );  //
 
 
 sb.addSubscribe("capture", "boolean");	// subscription for taking snapshot
-//sb.addSubscribe("stop", "boolean");	// subscription for stopping snapshopt
-
 
 sb.addPublish("image", "binary");		// publish the serialized binary image data
 
@@ -73,7 +71,8 @@ function onOpen() {
 			// Message
 			String("CAMERA emitted READ with ").green,
 			filename,
-			timestamp.grey
+			timestamp.grey,
+			"\n\n"
 		].join(" "));
 
 		//don't trigger on provisional file with trailing ~
@@ -163,7 +162,7 @@ function onBooleanMessage( name, value ){
 			if(value == true){
 				image_timestamp = new Date().getTime();
 
-		    	var image_name = image_timestamp + "." + camera.get("encoding");
+		    	//var image_name = image_timestamp + "." + camera.get("encoding");
 
 		    	console.log([
 			      // Timestamp
@@ -177,18 +176,5 @@ function onBooleanMessage( name, value ){
 				camera.start();
 			    	
 			}	
-		case "stop":
-			if(value == true){
-				console.log([
-			      // Timestamp
-			      String(+new Date()).grey,
-			      // Message
-			      String("stopping camera").magenta
-			    ].join(" "));
-
-				// stop timelapse
-				//camera.stop();
-			}
-			break;
 	}
 }
