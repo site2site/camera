@@ -10,7 +10,7 @@ var RaspiCam = require("raspicam"),
 
 var image_path = __dirname + "/files/";
 
-var IMAGE_TTL = 40000;//time after which to delete image
+var IMAGE_TTL = 0;//time after which to delete image
 
 
 // setup spacebrew
@@ -71,8 +71,7 @@ function onOpen() {
 			// Message
 			String("CAMERA emitted READ with ").green,
 			filename,
-			timestamp.grey,
-			"\n\n"
+			timestamp.grey
 		].join(" "));
 
 		//don't trigger on provisional file with trailing ~
@@ -83,7 +82,6 @@ function onOpen() {
 
 				fs.readFile(image_path + filename, function(err, data) {
 					var base64data = data.toString('base64');
-					console.log('sending base 64 with length' + base64data.length);
 
 					var message = { 
 						filename: filename,
@@ -92,10 +90,29 @@ function onOpen() {
 						encoding: "png"
 					};
 
-					console.log('sending image with filename: ' + message.filename );
+					// send to controller via Spacebrew
 					sb.send("image", "binary", JSON.stringify( message ) );
 
+					console.log([
+						// Timestamp
+						String(+new Date()).grey,
+						// Message
+						String("+++++++ SENT to controller: ").cyan,
+						message.filename,
+						"\n\n"
+					].join(" "));
+
+
+					// delete image file
 					if(IMAGE_TTL > 0){
+						console.log([
+							// Timestamp
+							String(+new Date()).grey,
+							// Message
+							String("Deleting file: ").red,
+							image_path + filename
+						].join(" "));
+
 						//delete file after 40s
 						setTimeout(function(){
 							fs.unlink(image_path + filename, function (err) {
