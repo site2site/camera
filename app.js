@@ -26,7 +26,7 @@ sb.addSubscribe("capture", "boolean");	// subscription for taking snapshot
 sb.addSubscribe("stop", "boolean");	// subscription for stopping snapshopt
 
 
-sb.addPublish("image", "message");		// publish the serialized binary image data
+sb.addPublish("image", "binary");		// publish the serialized binary image data
 
 
 sb.onBooleanMessage = onBooleanMessage;	
@@ -80,7 +80,7 @@ function onOpen() {
 					};
 
 					console.log('sending image with filename: ' + message.filename );
-					sb.send("image", "message", JSON.stringify( message ) );
+					sb.send("image", "binary", JSON.stringify( message ) );
 
 					if(IMAGE_TTL > 0){
 						//delete file after 40s
