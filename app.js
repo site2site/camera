@@ -159,7 +159,7 @@ function onBooleanMessage( name, value ){
 			    ].join(" "));
 
 				// stop timelapse
-				camera.stop();
+				//camera.stop();
 			}
 			break;
 	}
