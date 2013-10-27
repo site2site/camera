@@ -50,7 +50,7 @@ function onOpen() {
 		encoding: "png",
 		width: 640,
 		height: 480,
-		nopreview: true,
+		//nopreview: true,
 		//colfx: "128:128", //greyscale
 		timeout: 0 // take snapshot immediately with 0 delay
 	});
