@@ -23,7 +23,7 @@ sb = new Spacebrew.Client( config.server, config.name, config.description );  //
 
 
 sb.addSubscribe("capture", "boolean");	// subscription for taking snapshot
-sb.addSubscribe("stop", "boolean");	// subscription for stopping snapshopt
+//sb.addSubscribe("stop", "boolean");	// subscription for stopping snapshopt
 
 
 sb.addPublish("image", "binary");		// publish the serialized binary image data
@@ -187,7 +187,7 @@ function onBooleanMessage( name, value ){
 			    ].join(" "));
 
 				// stop timelapse
-				camera.stop();
+				//camera.stop();
 			}
 			break;
 	}
