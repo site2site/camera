@@ -3,7 +3,6 @@ var RaspiCam = require("raspicam"),
 	Spacebrew = require('./sb-1.3.0').Spacebrew,
 	sb,
 	camera,
-	image_timestamp,
 	config = require("./machine"),
 	fs = require("fs");
 
@@ -40,9 +39,6 @@ sb.connect();
 function onOpen() {
 	console.log( "Connected through Spacebrew as: " + sb.name() + "." );
 
-	image_timestamp = new Date().getTime();//temporary timestamp
-	console.log("connected at: " + image_timestamp + "\n");
-
 	// initialize RaspiCam timelapse
 	camera = new RaspiCam({
 		mode: "photo",
@@ -66,9 +62,10 @@ function onOpen() {
 	});
 
 	camera.on("read", function( err, timestamp, filename ){
+		var timestamp = new Date().getTime();
 		console.log([
 			// Timestamp
-			String(+new Date()).grey,
+			String(timestamp).grey,
 			// Message
 			String("CAMERA emitted READ with ").green,
 			filename,
@@ -86,7 +83,7 @@ function onOpen() {
 
 					var message = { 
 						filename: filename,
-						image_timestamp: image_timestamp,
+						image_timestamp: timestamp,
 						binary: base64data,
 						encoding: "png"
 					};
@@ -178,10 +175,7 @@ function onBooleanMessage( name, value ){
 	switch(name){
 		case "capture":
 			if(value == true){
-				image_timestamp = new Date().getTime();
-
-		    	//var image_name = image_timestamp + "." + camera.get("encoding");
-
+				
 		    	console.log([
 			      // Timestamp
 			      String(+new Date()).grey,
