@@ -102,27 +102,14 @@ function onOpen() {
 
 
 					// delete image file
-					if(IMAGE_TTL > 0){
-						console.log([
-							// Timestamp
-							String(+new Date()).grey,
-							// Message
-							String("Deleting file: ").red,
-							image_path + filename
-						].join(" "));
+					fs.unlink(image_path + filename, function (err) {
+						if (err){
+							console.log("Error attempting to delete: " + image_path + filename );
+							return false;
+						}
+						console.log("Deleted: " + image_path + filename );
 
-						//delete file after 40s
-						setTimeout(function(){
-							fs.unlink(image_path + filename, function (err) {
-								if (err){
-									console.log("Error attempting to delete: " + image_path + filename );
-									return false;
-								}
-								console.log("Deleted: " + image_path + filename );
-
-							});
-						}, IMAGE_TTL);
-					}
+					});
 					
 				});
 			}, 2000);
@@ -175,7 +162,7 @@ function onBooleanMessage( name, value ){
 	switch(name){
 		case "capture":
 			if(value == true){
-				
+
 		    	console.log([
 			      // Timestamp
 			      String(+new Date()).grey,
